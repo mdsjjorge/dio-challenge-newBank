@@ -1,10 +1,9 @@
 package dio.challenge.newBank.domain.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.Data;
+
+import java.util.List;
 
 @Data
 @Entity(name = "nb_user")
@@ -15,5 +14,17 @@ public class User {
     private Long id;
 
     private String name;
+
+    @OneToOne(cascade = CascadeType.ALL)
+    private Account account;
+
+    @OneToOne(cascade = CascadeType.ALL)
+    private Card card;
+
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    private List<Feature> features;
+
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    private List<News> news;
 
 }
