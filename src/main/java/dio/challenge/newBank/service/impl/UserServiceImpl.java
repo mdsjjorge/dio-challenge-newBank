@@ -3,6 +3,8 @@ package dio.challenge.newBank.service.impl;
 import dio.challenge.newBank.domain.model.User;
 import dio.challenge.newBank.domain.repository.UserRepository;
 import dio.challenge.newBank.service.UserService;
+import dio.challenge.newBank.service.exception.BusinessException;
+import dio.challenge.newBank.service.exception.NotFoundException;;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import static java.util.Optional.ofNullable;
@@ -27,31 +29,31 @@ public class UserServiceImpl implements UserService {
 
     @Transactional(readOnly = true)
     public User findById(Long id) {
-        return this.userRepository.findById(id).orElseThrow(NoSuchElementException::new);
+        return this.userRepository.findById(id).orElseThrow(NotFoundException::new);
     }
 
     @Transactional
-    public User create(User userToCreate) throws Exception {
-        ofNullable(userToCreate).orElseThrow(() -> new Exception("User to create must not be null."));
-        ofNullable(userToCreate.getAccount()).orElseThrow(() -> new Exception("User account must not be null."));
-        ofNullable(userToCreate.getCard()).orElseThrow(() -> new Exception("User card must not be null."));
+    public User create(User userToCreate) {
+        ofNullable(userToCreate).orElseThrow(() -> new BusinessException("User to create must not be null."));
+        ofNullable(userToCreate.getAccount()).orElseThrow(() -> new BusinessException("User account must not be null."));
+        ofNullable(userToCreate.getCard()).orElseThrow(() -> new BusinessException("User card must not be null."));
 
         this.validateChangeableId(userToCreate.getId(), "created");
         if (userRepository.existsByAccountNumber(userToCreate.getAccount().getNumber())) {
-            throw new Exception("This account number already exists.");
+            throw new BusinessException("This account number already exists.");
         }
         if (userRepository.existsByCardNumber(userToCreate.getCard().getNumber())) {
-            throw new Exception("This card number already exists.");
+            throw new BusinessException("This card number already exists.");
         }
         return this.userRepository.save(userToCreate);
     }
 
     @Transactional
-    public User update(Long id, User userToUpdate) throws Exception {
+    public User update(Long id, User userToUpdate) {
         this.validateChangeableId(id, "updated");
         User dbUser = this.findById(id);
         if (!dbUser.getId().equals(userToUpdate.getId())) {
-            throw new Exception("Update IDs must be the same.");
+            throw new BusinessException("Update IDs must be the same.");
         }
 
         dbUser.setName(userToUpdate.getName());
@@ -64,15 +66,15 @@ public class UserServiceImpl implements UserService {
     }
 
     @Transactional
-    public void delete(Long id) throws Exception {
+    public void delete(Long id) {
         this.validateChangeableId(id, "deleted");
         User dbUser = this.findById(id);
         this.userRepository.delete(dbUser);
     }
 
-    private void validateChangeableId(Long id, String operation) throws Exception {
+    private void validateChangeableId(Long id, String operation) {
         if (UNCHANGEABLE_USER_ID.equals(id)) {
-            throw new Exception("User with ID %d can not be %s.".formatted(UNCHANGEABLE_USER_ID, operation));
+            throw new BusinessException("User with ID %d can not be %s.".formatted(UNCHANGEABLE_USER_ID, operation));
         }
     }
 }
