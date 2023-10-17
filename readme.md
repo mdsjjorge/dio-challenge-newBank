@@ -4,6 +4,14 @@
 
 - [x] challenge proposed by [falvojr](https://github.com/falvojr)
 
+## Documentation with OpenAPI (Swagger)
+
+build made with RAILWAY and available at the URL below
+
+```agsl
+https://newbank-dio.up.railway.app/swagger-ui/index.html
+```
+
 ## Installation
 
 1. Clone the repository:
